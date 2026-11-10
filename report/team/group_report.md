@@ -62,10 +62,10 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |
-| v1 |  |  |  |  |  |
-| v2 |  |  |  |  |  |
-| v3 |  |  |  |  |  |
+| v0 | Baseline configuration | Initial baseline measurement for tool routing and argument accuracy on the core research agent benchmark. | - | Case Acc: 55.0% (11/20)<br>Routing Acc: 75.0%<br>Arg Acc: 55.0% | `v0_B_base_openai_20261110T175050488620.json` |
+| v2 | `tools.yaml` | Optimizing tool definitions and parameter schemas reduces argument value errors and improves multi-turn context retention. | Case Acc: 70.0% (14/20) | Case Acc: 90.0% (18/20)<br>Routing Acc: 95.0%<br>Multi-turn Acc: 100.0% | `v2_B_base_openai_20261110T182303997939.json` |
+| v3 | `system_prompt.md` & `tools.yaml` | Aligning system prompt rules with tool definition constraints fixes edge-case query formatting mismatches. | Case Acc: 90.0% (18/20) | Case Acc: 95.0% (19/20)<br>Routing Acc: 95.0%<br>Arg Acc: 95.0% | `v3_B_base_openai_20261110T184305315541.json` |
+| v4 | `tools.yaml` & `eval_group.json` | Supporting new tools (`github_search`, `wiki_summary`, `hf_papers`, `save_note`) enables full pass rate on custom group evaluation cases. | Case Acc: 95.0% (19/20 base) | Case Acc: 100.0% (10/10)<br>Routing Acc: 100.0%<br>Arg Acc: 100.0% | `v4_B_group_openai_20261110T191704104430.json` |
 
 ### B2. Failure Analysis
 
