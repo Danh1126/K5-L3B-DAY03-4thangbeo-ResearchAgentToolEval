@@ -73,7 +73,13 @@ Lấy từ `results[*].result.failures` trong run JSON.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R03_web_news_routing | wrong_tool | lookup(query="AI news", topic="news", max_results=5)  | Expected query="AI", got query="AI news" |  |
+| R08_out_of_scope | out_of_scope | send(text="Nguyên hàm của x^2 là...")  |Expected no tool call, but model called send tool with calculus solution |  |
+| R10_missing_handle | missing_info | timeline(screenname="sama") | Missing tool call clarify and extra tool call timeline. Guessed handle sama instead of asking user |  |
+| R11_missing_url | wrong_tool | fetch(url="[https://example.com/article]")  | Missing tool call clarify and extra tool call fetch. Used placeholder URL |  |
+| R12_confirm_before_send | wrong_boundary | send(text="Bản tin này")  | Missing tool call clarify and extra tool call send. Executed write/send action without user confirmation. |  |
+| R13_parallel_web_and_tweets | wrong_tool | lookup(query="AI news", timeframe="day", max_results=5), social_search(query="AI", search_type="Latest", limit=5)  | Expected query="AI" and topic="news", but got query="AI news" and topic=None |  |
+| R14_out_of_scope_coding | out_of_scope | send(text="Dưới đây là một hàm Python...") | Expected no tool call, but model called send tool with Python code | |
 
 ### B3. Team Eval Cases
 
