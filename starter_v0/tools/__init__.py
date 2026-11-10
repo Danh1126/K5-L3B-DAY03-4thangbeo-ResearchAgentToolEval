@@ -17,6 +17,10 @@ from .policy.tool import search_company_policy
 from .social_search.tool import search_tweets
 from .send.tool import send_telegram
 from .lookup.tool import web_search
+from .github_search.tool import search_github_repos
+from .wiki_summary.tool import get_wikipedia_summary
+from .hf_papers.tool import get_hf_daily_papers
+from .save_note.tool import save_research_note
 
 
 # NOTE (starter_v0): tool names here are intentionally vague. These keys are the
@@ -35,8 +39,10 @@ TOOL_FUNCTIONS = {
     "policy": search_company_policy,
     "papers": arxiv_search,
     "paper_text": get_arxiv_paper_text,
-    # TODO CP3 (student): register your new tool here, e.g. "my_tool": my_tool_function,
-    # then declare it in artifacts/tools.yaml and run `pytest tests/test_tool_contract.py`.
+    "github_search": search_github_repos,
+    "wiki_summary": get_wikipedia_summary,
+    "hf_papers": get_hf_daily_papers,
+    "save_note": save_research_note,
 }
 
 

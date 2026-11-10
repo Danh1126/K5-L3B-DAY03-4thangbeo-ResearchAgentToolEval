@@ -81,7 +81,17 @@ Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn
 
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
-|  |  |  |  |
+| `G01_github_search_routing` | Tìm repo GitHub theo ngôn ngữ và độ phổ biến. | `github_search(language="Python", sort_by="stars", limit=3)` | PASS — run group v4 |
+| `G02_wiki_summary_routing` | Tóm tắt Wikipedia tiếng Việt, không dùng tìm kiếm web chung. | `wiki_summary(lang="vi")` | PASS — run group v4 |
+| `G03_hf_papers_routing` | Tìm paper nổi bật trên Hugging Face Daily Papers, không nhầm với arXiv. | `hf_papers(limit=5)` | PASS — run group v4 |
+| `G04_missing_github_query` | Thiếu chủ đề tìm repo thì hỏi lại, không tự bịa query. | `clarify(response_type="text")` | PASS — run group v4 |
+| `G05_no_tool_translate` | Dịch thuật đơn thuần không cần nghiên cứu hay lưu file. | Trả lời trực tiếp; không gọi tool. | PASS — run group v4 |
+| `GM01_github_clarify_then_fill` | Nhiều lượt bổ sung chủ đề, ngôn ngữ và cách sắp xếp; giữ giới hạn 5. | `github_search(language="TypeScript", sort_by="stars", limit=5)` | PASS — run group v4 |
+| `GM02_save_note_research` | Nhiều lượt cung cấp tiêu đề/nội dung rồi yêu cầu lưu ghi chú cục bộ. | `save_note(title="Agent Eval Notes")` | PASS — run group v4 |
+| `GM03_switch_arxiv_to_hf_papers` | Đổi yêu cầu từ arXiv sang Hugging Face Daily Papers và lấy 3 bài. | `hf_papers(limit=3)` | PASS — run group v4 |
+| `GM04_switch_web_to_wiki` | Đổi từ tìm web sang tóm tắt Wikipedia tiếng Anh; không tiếp tục gọi tìm web. | `wiki_summary(lang="en")` | FAIL — gọi thêm `lookup`; run group v4 |
+| `GM05_policy_carryover_area` | Nhiều lượt giữ lĩnh vực bảo mật dữ liệu và giới hạn số đoạn policy. | `policy(policy_area="data_privacy", top_k=2)` | PASS — run group v4 |
+
 
 ### B4. Live Chat Evidence
 

@@ -1,7 +1,299 @@
 {
   "dataset_id": "day03_v2_research_group",
   "dataset_role": "group",
-  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "10 eval cases do nhóm tự viết (5 single turn + 5 multi turn) kiểm tra cả 4 tool mới (github_search, wiki_summary, hf_papers, save_note), policy, clarify và out-of-scope.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_github_search_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm 3 repo GitHub phổ biến nhất về MCP server viết bằng Python",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_search",
+            "args": {
+              "language": "Python",
+              "sort_by": "stars",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_new_tool_github_search",
+        "difficulty": "easy",
+        "what_it_tests": "Yêu cầu tìm repo GitHub theo ngôn ngữ và độ phổ biến -> route tới tool mới github_search(language='Python', sort_by='stars', limit=3)."
+      }
+    },
+    {
+      "id": "G02_wiki_summary_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Lấy tóm tắt Wikipedia tiếng Việt về Trí tuệ nhân tạo",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki_summary",
+            "args": {
+              "lang": "vi"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_new_tool_wiki_summary",
+        "difficulty": "easy",
+        "what_it_tests": "Yêu cầu tóm tắt Wikipedia tiếng Việt -> route tới tool mới wiki_summary(lang='vi'), không gọi lookup."
+      }
+    },
+    {
+      "id": "G03_hf_papers_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Xem 5 paper AI đang nổi bật trên Hugging Face Daily Papers hôm nay",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "hf_papers",
+            "args": {
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_new_tool_hf_papers",
+        "difficulty": "easy",
+        "what_it_tests": "Yêu cầu paper trending trên Hugging Face Daily Papers -> route tới tool mới hf_papers(limit=5), không nhầm sang papers (arXiv)."
+      }
+    },
+    {
+      "id": "G04_missing_github_query",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm giúp mình 5 repo trên GitHub",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "clarify_missing_github_topic",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu tìm repo GitHub nhưng thiếu từ khóa/chủ đề -> gọi clarify(response_type='text'), không tự bịa từ khóa."
+      }
+    },
+    {
+      "id": "G05_no_tool_translate",
+      "phase": "B",
+      "suite": "group",
+      "query": "Dịch giúp mình câu 'Prompt engineering requires empirical evaluation' sang tiếng Việt.",
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "metadata": {
+        "skill": "no_tool_translation",
+        "difficulty": "easy",
+        "what_it_tests": "Yêu cầu dịch thuật đơn thuần không cần tìm kiếm hay lưu file -> trả lời trực tiếp, không gọi tool."
+      }
+    },
+    {
+      "id": "GM01_github_clarify_then_fill",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm 5 repo GitHub phổ biến giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Về chủ đề AI agent và lọc ngôn ngữ TypeScript"
+        },
+        {
+          "role": "user",
+          "content": "Sắp xếp theo số sao nhiều nhất, giữ 5 repo"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_search",
+            "args": {
+              "language": "TypeScript",
+              "sort_by": "stars",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_github_fill",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: bổ sung chủ đề AI agent + lọc TypeScript cho tool mới github_search, giữ limit=5 và sort_by=stars."
+      }
+    },
+    {
+      "id": "GM02_save_note_research",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Mình vừa tổng hợp xong ghi chú về đánh giá agent"
+        },
+        {
+          "role": "user",
+          "content": "Tiêu đề là 'Agent Eval Notes', nội dung là 'Always check tool routing and args.'"
+        },
+        {
+          "role": "user",
+          "content": "Lưu ghi chú này thành file markdown cục bộ giúp mình"
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "save_note",
+            "args": {
+              "title": "Agent Eval Notes"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_new_tool_save_note",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: yêu cầu lưu ghi chú thành file markdown cục bộ -> route tới tool mới save_note với title='Agent Eval Notes'."
+      }
+    },
+    {
+      "id": "GM03_switch_arxiv_to_hf_papers",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm paper trên arXiv về multimodal"
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ arXiv, xem trên Hugging Face Daily Papers đi"
+        },
+        {
+          "role": "user",
+          "content": "Lọc chủ đề multimodal và lấy 3 bài"
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "hf_papers",
+            "args": {
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_switch_to_hf_papers",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: chuyển từ arXiv (papers) sang Hugging Face Daily Papers (hf_papers) và lấy limit=3."
+      }
+    },
+    {
+      "id": "GM04_switch_web_to_wiki",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm trên web về Transformer architecture"
+        },
+        {
+          "role": "user",
+          "content": "Đổi sang lấy tóm tắt chuẩn từ Wikipedia tiếng Anh"
+        },
+        {
+          "role": "user",
+          "content": "Chủ đề Transformer"
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki_summary",
+            "args": {
+              "lang": "en"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_switch_to_wiki",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: chuyển từ tìm web (lookup) sang lấy tóm tắt Wikipedia tiếng Anh (wiki_summary lang='en')."
+      }
+    },
+    {
+      "id": "GM05_policy_carryover_area",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Công ty có quy định nội bộ gì về bảo mật dữ liệu (data privacy) không?"
+        },
+        {
+          "role": "user",
+          "content": "Cụ thể là quy định về dữ liệu người dùng và API key?"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn tìm trong mục bảo mật dữ liệu, lấy 2 đoạn thôi"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "policy_area": "data_privacy",
+              "top_k": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_policy_carryover",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: giữ policy_area=data_privacy xuyên suốt hội thoại và cập nhật top_k=2."
+      }
+    }
+  ]
 }
