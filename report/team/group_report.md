@@ -29,7 +29,7 @@ Từ thư mục `starter_v0/`, chạy `python -m streamlit run app.py`. Dependen
 **Link dùng thử (deploy):**
 
 > Dán link public để team khác mở thử ngay. Cách deploy nhanh bằng Cloudflare Tunnel xem README. Nếu deploy Vercel/Streamlit Cloud thì dán link đó.
-Chưa có link public; chạy local tại `http://localhost:8501`.
+(https://k5-l3b-day03-4thangbeo-m2o8.onrender.com/)
 
 ### A2. Tool agent có
 
