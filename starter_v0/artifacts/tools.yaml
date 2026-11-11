@@ -165,3 +165,55 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang PDF tối đa cần trích."}
         max_chars: {type: integer, default: 8000, description: "Số ký tự tối đa trả về."}
       required: [arxiv_url]
+
+  # ---------------- Team new tools (4 tools) ----------------
+  - name: github_search
+    description: >-
+      Tìm kiếm repository mã nguồn mở trên GitHub theo từ khóa và ngôn ngữ lập trình.
+      KHI NÀO DÙNG: người dùng tìm repo GitHub, thư viện open-source, code project hoặc công cụ trên GitHub.
+      KHI NÀO KHÔNG DÙNG: tìm tin tức web nói chung (dùng `lookup`), tìm tweet (dùng `social_search`), hoặc tìm paper khoa học (dùng `papers` / `hf_papers`).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Từ khóa chủ đề cốt lõi cần tìm trên GitHub."}
+        language: {type: string, default: "", description: "Ngôn ngữ lập trình cần lọc nếu người dùng nêu (ví dụ `Python`, `TypeScript`; để rỗng nếu không yêu cầu)."}
+        sort_by: {type: string, enum: [stars, updated], default: "stars", description: "Sắp xếp theo số sao (`stars`) cho repo phổ biến hoặc cập nhật mới (`updated`)."}
+        limit: {type: integer, default: 5, description: "Số repo tối đa (1–20, mặc định 5)."}
+      required: [query]
+
+  - name: wiki_summary
+    description: >-
+      Lấy bài tóm tắt bách khoa toàn thư của một khái niệm hoặc thực thể từ Wikipedia.
+      KHI NÀO DÙNG: người dùng yêu cầu tóm tắt Wikipedia hoặc định nghĩa chuẩn từ Wikipedia (tiếng Anh `en` hoặc tiếng Việt `vi`).
+      KHI NÀO KHÔNG DÙNG: tìm tin tức thời sự mới hôm nay (dùng `lookup`), tìm thảo luận MXH (dùng `social_search`), hoặc đọc một URL cụ thể (dùng `fetch`).
+    parameters:
+      type: object
+      properties:
+        topic: {type: string, default: "", description: "Tên chủ đề hoặc thực thể cần tra trên Wikipedia."}
+        lang: {type: string, enum: [en, vi], default: "en", description: "Ngôn ngữ Wikipedia: `vi` cho tiếng Việt, `en` cho tiếng Anh."}
+      required: [topic]
+
+  - name: hf_papers
+    description: >-
+      Lấy danh sách bài báo AI đang nổi bật/trending trên Hugging Face Daily Papers.
+      KHI NÀO DÙNG: người dùng hỏi paper AI nổi bật trên Hugging Face Daily Papers (có thể lọc theo từ khóa `query`).
+      KHI NÀO KHÔNG DÙNG: tìm kiếm học thuật tổng quát trên arXiv theo truy vấn (dùng `papers`) hoặc đọc toàn văn PDF arXiv (dùng `paper_text`).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Từ khóa lọc theo tiêu đề/tóm tắt paper (để rỗng nếu lấy tất cả paper trending)."}
+        limit: {type: integer, default: 5, description: "Số lượng paper tối đa (1–20, mặc định 5)."}
+      required: []
+
+  - name: save_note
+    description: >-
+      Lưu ghi chú nghiên cứu hoặc bản tóm tắt thành file Markdown cục bộ trong thư mục `notes/`.
+      KHI NÀO DÙNG: người dùng yêu cầu lưu ghi chú/tóm tắt ra file markdown cục bộ.
+      KHI NÀO KHÔNG DÙNG: gửi tin lên Telegram (dùng `send`) hoặc chỉ trình bày văn bản mà không lưu file (dùng `format`).
+    parameters:
+      type: object
+      properties:
+        title: {type: string, default: "", description: "Tiêu đề của ghi chú."}
+        content: {type: string, default: "", description: "Nội dung markdown cần lưu."}
+        filename: {type: string, default: "", description: "Tên file tuỳ chọn (không có đường dẫn `..` hoặc `/`; để trống để tự tạo từ `title`)."}
+      required: [title, content]
