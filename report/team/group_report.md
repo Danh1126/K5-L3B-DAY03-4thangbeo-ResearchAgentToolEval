@@ -8,7 +8,7 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: 4thangbeo
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
 - Provider/model dùng cho v0–v3:
 
@@ -18,17 +18,18 @@
 
 > 1–2 câu mô tả agent dùng để làm gì (cho team khác hiểu nhanh).
 
-Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL, tổng hợp thành digest, và gửi lên Telegram khi được xác nhận."
+Research Desk hỗ trợ tìm kiếm tin trên web và X/Twitter, tra cứu chính sách/paper, đọc URL hoặc tóm tắt Wikipedia, rồi tổng hợp kết quả 
+thành bản tin. Agent cũng có thể tìm repository GitHub, lấy paper nổi bật từ Hugging Face và lưu ghi chú cục bộ; mọi thao tác gửi lên 
+Telegram đều cần người dùng xác nhận trước.
 
 **Cách chạy UI:**
 
-> Lệnh chạy UI (ví dụ `streamlit run app.py`) và dependency đã thêm vào `starter_v0/requirements.txt`.
+Từ thư mục `starter_v0/`, chạy `python -m streamlit run app.py`. Dependency giao diện Streamlit được khai báo trong `starter_v0/requirements.txt`.
 
 **Link dùng thử (deploy):**
 
 > Dán link public để team khác mở thử ngay. Cách deploy nhanh bằng Cloudflare Tunnel xem README. Nếu deploy Vercel/Streamlit Cloud thì dán link đó.
->
-> URL:
+Chưa có link public; chạy local tại `http://localhost:8501`.
 
 ### A2. Tool agent có
 
@@ -37,22 +38,42 @@ Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc 
 | Tên tool | Làm được gì | Tool mới nhóm thêm? |
 |---|---|---|
 | clarify | hỏi lại người dùng khi thiếu thông tin | không |
-|  |  |  |
-|  |  |  |
+| timeline | lấy các bài đăng gần đây từ tài khoản X/Twitter cụ thể | không |
+| social_search | tìm bài đăng X/Twitter theo từ khóa hoặc chủ đề | không |
+| lookup | tìm thông tin và tin tức trên web | không |
+| fetch | đọc và trích xuất nội dung từ URL cụ thể | không |
+| format | tổng hợp dữ liệu đã thu thập thành digest Markdown | không |
+| send | gửi nội dung lên Telegram sau khi người dùng xác nhận | không |
+| policy | tra cứu chính sách và quy định nội bộ của công ty | không |
+| papers | tìm bài báo khoa học trên arXiv | không |
+| paper_text | tải PDF arXiv và trích xuất nội dung văn bản | không |
+| github_search | tìm repository GitHub theo chủ đề, ngôn ngữ và mức độ phổ biến | đúng |
+| wiki_summary | lấy tóm tắt chủ đề từ Wikipedia tiếng Anh hoặc tiếng Việt | đúng |
+| hf_papers | tìm bài báo AI nổi bật trên Hugging Face Daily Papers | đúng |
+| save_note | lưu ghi chú nghiên cứu thành file Markdown cục bộ | đúng |
 
 ### A3. Câu hỏi mẫu để thử
 
 > 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
 
-1.
-2.
-3.
+1. Tin tức AI hôm nay có gì nổi bật?
+2. Tìm 3 repository GitHub về agent viết bằng Python, sắp xếp theo số sao.
+3. Tóm tắt Wikipedia tiếng Việt về trí tuệ nhân tạo.
+4. Có những paper AI nào nổi bật trên Hugging Face Daily Papers hôm nay?
+5. Lưu ghi chú nghiên cứu với tiêu đề “Agent Eval Notes” và nội dung “Các kết quả cần xem lại”.
+
 
 ## 3. Giải pháp
 
 > Tóm tắt các thay đổi chính trong `starter_v0/artifacts/system_prompt.md` và `starter_v0/artifacts/tools.yaml`, và tool mới nhóm viết (tên, làm gì, khi nào agent nên gọi).
 
--
+- `system_prompt.md` quy định agent phải hỏi lại khi thiếu handle hoặc URL thay vì đoán; luôn xin xác nhận yes/no trước khi gửi/đăng và chỉ gọi `send` với `confirmed=true` sau khi người dùng đồng ý. Prompt cũng hướng dẫn gọi song song `lookup` và `social_search` khi cần cả nguồn web lẫn mạng xã hội, giữ `lookup.query` chỉ gồm từ khóa chủ đề, và trả lời trực tiếp các yêu cầu ngoài phạm vi tool.
+- `tools.yaml` mô tả mục đích, trường hợp nên/không nên dùng và quy ước đối số của từng tool; bổ sung schema cho 4 tool mới, đồng thời làm rõ ranh giới xác nhận của `send` và cách phân biệt các nguồn tìm kiếm.
+- Nhóm tự viết và đăng ký 4 tool mới trong `tools/__init__.py` và `tools.yaml`:
+  - `github_search`: tìm repository GitHub theo chủ đề, lọc ngôn ngữ và sắp xếp theo sao/cập nhật; dùng khi người dùng cần tìm dự án hoặc thư viện mã nguồn mở.
+  - `wiki_summary`: lấy tóm tắt một chủ đề từ Wikipedia tiếng Anh hoặc tiếng Việt; dùng khi người dùng yêu cầu nguồn Wikipedia, không dùng thay tìm tin mới.
+  - `hf_papers`: lấy danh sách paper AI nổi bật từ Hugging Face Daily Papers, có thể lọc từ khóa; dùng cho yêu cầu paper trending, còn tìm học thuật tổng quát thì dùng `papers`.
+  - `save_note`: lưu tiêu đề và nội dung thành file Markdown trong `notes/`; chỉ dùng khi người dùng yêu cầu lưu ghi chú, không dùng thay gửi Telegram hoặc chỉ trình bày câu trả lời.
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 
@@ -116,7 +137,9 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 | UI (lệnh chạy + link dùng thử) |  |  |  |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
-
+Số test đã viết: 12 tests (3 tests/tool × 4 tools: github_search, wiki_summary, hf_papers, save_note )
+- Lỗi không xử lý ngoại lệ khi API trả về mã lỗi HTTP 429 (Too Many Requests) hoặc HTTP 500 (Server Error).
+Chi tiết: Tập đánh giá eval_group.json tập trung vào luồng chạy chuẩn (happy path) để đo độ chính xác routing và argument của agent. Nếu API bên ngoài bị nghẽn mạng, eval chỉ ghi nhận agent thất bại chung chung. Trong khi đó, Unit Test sử dụng unittest.mock giả lập phản hồi HTTP status 429/500 sẽ bắt được ngay lỗi thiếu khối try-except trong file tool.py, ngăn chương trình bị crash đột ngột.   
 ### B5. Bonus Evidence
 
 Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool có sẵn (`send`, `policy`, `papers`, `paper_text`) không tự được bonus.
